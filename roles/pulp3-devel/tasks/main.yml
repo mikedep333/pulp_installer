@@ -11,6 +11,7 @@
           - iotop
           - jnettop
           - jq
+          - make
           - ncdu
           - tmux
           - tree
