@@ -1,0 +1,7 @@
+---
+pulp_secret_key: secret
+pulp_default_admin_password: password
+pulp_install_via_rpm: yes
+pulp_install_plugins:
+  pulp-file:
+    app_label: "file"
