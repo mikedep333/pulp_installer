@@ -1,4 +1,4 @@
 ---
-- src: https://github.com/dralley/ansible-role-postgresql
-  version: master
+- src: https://github.com/mikedep333/ansible-role-postgresql
+  version: F30
   name: geerlingguy.postgresql
