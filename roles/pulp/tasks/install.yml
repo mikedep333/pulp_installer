@@ -12,9 +12,10 @@
         name: '{{ pulp_preq_packages }}'
         state: present
 
+    # Needed by psycopg2-binary from PyPI
     - name: Install prerequisites (Fedora 30+ only)
       package:
-        name: libxcrypt-compat # Needed by psycopg2-binary from PyPI
+        name: libxcrypt-compat
         state: present
       when:
         - ansible_distribution == "Fedora"
