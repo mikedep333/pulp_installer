@@ -14,7 +14,7 @@
 
     - name: Install prerequisites (Fedora 30+ only)
       package:
-        name: libxcrypt-compat #Needed by psycopg2-binary from PyPI
+        name: libxcrypt-compat # Needed by psycopg2-binary from PyPI
         state: present
       when:
         - ansible_distribution == "Fedora"
