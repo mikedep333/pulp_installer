@@ -5,8 +5,15 @@
     state: present
     virtualenv: '{{ pulp_install_dir }}'
     virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+  when: not pulp_install_via_rpm
   become: true
   become_user: '{{ pulp_user }}'
+
+- name: Install gunicorn via OS package manager
+  package:
+    name: gunicorn
+  when: pulp_install_via_rpm
+  become: true
 
 - block:
 

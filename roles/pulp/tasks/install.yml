@@ -142,5 +142,16 @@
       changed_when: result.changed and not pulp_pip_editable
       notify: Collect static content
 
+  when: not pulp_install_via_rpm
   become: true
   become_user: '{{ pulp_user }}'
+
+- block:
+
+    # Depends on pulpcore
+    - name: Install pulpcore-plugin package from OS package manager
+      package:
+        name: python3-pulpcore-plugin
+
+  when: pulp_install_via_rpm
+  become: true
