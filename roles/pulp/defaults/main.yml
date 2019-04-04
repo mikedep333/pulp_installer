@@ -13,3 +13,4 @@ pulp_pip_editable: yes
 pulp_api_host: localhost
 pulp_api_port: 8000
 pulp_install_via_rpm: no
+pulp_copr_repo: 'mikedep333/pulp3-fedora-rpms'

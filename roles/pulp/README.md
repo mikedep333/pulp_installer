@@ -36,6 +36,8 @@ Role Variables:
 * `pulp_api_port` Set the port the API server is served from. Defaults to '8000'.
 * `pulp_api_host` Set the host the API server is served from. Defaults to 'localhost'.
 * `pulp_install_via_rpm` Install Pulp via RPM rather than PyPI.
+* `pulp_copr_repo` The copr repo to enable to obtain Pulp from when installing
+  in RPM mode rather than PyPI.
 
 Shared Variables:
 -----------------
