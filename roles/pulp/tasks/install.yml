@@ -17,8 +17,8 @@
         name: libxcrypt-compat #Needed by psycopg2-binary from PyPI
         state: present
       when:
-      - ansible_distribution == "Fedora"
-      - ansible_distribution_version|int >= 30
+        - ansible_distribution == "Fedora"
+        - ansible_distribution_version|int >= 30
 
     - name: Disable SELinux (Pulp 3 is currently incompatible with SELinux)
       selinux:
