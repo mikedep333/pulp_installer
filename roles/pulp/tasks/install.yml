@@ -148,6 +148,11 @@
 
 - block:
 
+    - name: Enable copr repo
+      command: 'dnf copr enable -y {{ pulp_copr_repo }}'
+      args:
+        creates: '/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:{{ pulp_copr_repo|replace("/",":") }}'
+
     # Depends on pulpcore
     - name: Install pulpcore-plugin package from OS package manager
       package:
