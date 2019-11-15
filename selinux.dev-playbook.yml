@@ -1,0 +1,74 @@
+---
+- hosts: all
+  vars:
+  pre_tasks:
+    # The version string below is the highest of all those in roles' metadata:
+    # "min_ansible_version". It needs to be kept manually up-to-date.
+    - name: Verify Ansible meets min required version
+      assert:
+        that: "ansible_version.full is version_compare('2.8', '>=')"
+        msg: >
+          "You must update Ansible to at least 2.8 to use this version of Pulp 3 Installer."
+
+    - name: Include vars after running setup
+      include_vars: selinux.dev-config.yml
+
+    - name: Create devel dir
+      file:
+        path: "{{ developer_user_home }}/devel"
+        state: directory
+        mode: 0777
+        owner: "{{ developer_user }}"
+      become: true
+      become_user: '{{ developer_user }}'
+
+    - name: Install git
+      package:
+        name: git
+      become: true
+
+    # Cloning all of them (rather than VCS URLs) facilitates running tests
+    - name: get git repos
+      git:
+        repo: "https://github.com/pulp/{{ item.name }}.git"
+        dest: "{{ developer_user_home }}/devel/{{ item.name }}"
+        umask: "000"
+        version: "{{ item.version }}"
+      with_items:
+        - { name: "pulpcore", version: "3.0" }
+        - { name: "pulp_file", version: "0.1" }
+        - { name: "pulp_container", version: "1.0" }
+        - { name: "pulp_rpm", version: "master" }
+        - { name: "pulp-certguard", version: "master" }
+      become: true
+      become_user: '{{ developer_user }}'
+
+  post_tasks:
+    - name: workaround lack of test_requirements.txt
+      copy:
+        content: "# All test requirements\n-r functest_requirements.txt\n-r unittest_requirements.txt\n"
+        dest: "{{ developer_user_home }}/devel/pulp-certguard/test_requirements.txt"
+        mode: 0666
+      become: true
+      become_user: '{{ developer_user }}'
+
+    - name: install test requirements for plugins
+      pip:
+        requirements: '{{ item.value.source_dir }}/test_requirements.txt'
+        state: present
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      with_dict: '{{ pulp_install_plugins }}'
+      when: pulp_install_plugins[item.key].source_dir is defined
+      become: true
+      become_user: '{{ pulp_user }}'
+
+  roles:
+    - pulp-database
+    - pulp-workers
+    - pulp-resource-manager
+    - pulp-webserver
+    - pulp-content
+    - pulp-devel
+  environment:
+    DJANGO_SETTINGS_MODULE: pulpcore.app.settings

@@ -1,0 +1,38 @@
+---
+# Options
+pulp_devel_supplement_bashrc: true
+pulp_default_admin_password: password
+
+pulp_user: "{{ ansible_user_id }}"
+developer_user: "{{ ansible_user_id }}"
+developer_user_home: "{{ ansible_user_dir }}"
+pulp_source_dir: "{{ developer_user_home }}/devel/pulpcore"
+
+pulp_install_plugins:
+  # pulp-ansible:
+  #   source_dir: "/home/vagrant/devel/pulp_ansible"
+  pulp-certguard:
+    source_dir: "{{ developer_user_home }}/devel/pulp-certguard"
+  # pulp-cookbook:
+  #   source_dir: "/home/vagrant/devel/pulp_cookbook"
+  # pulp-deb:
+  #   source_dir: "/home/vagrant/devel/pulp_deb"
+  pulp-container:
+    source_dir: "{{ developer_user_home }}/devel/pulp_container"
+  # pulp-gem:
+  #   source_dir: "/home/vagrant/devel/pulp_gem"
+  # pulp-maven:
+  #   source_dir: "/home/vagrant/devel/pulp_maven"
+  # pulp-python:
+  #   source_dir: "/home/vagrant/devel/pulp_python"
+  pulp-rpm:
+    source_dir: "{{ developer_user_home }}/devel/pulp_rpm"
+    prereq_role: "pulp.pulp_rpm_prerequisites"
+  pulp-file:
+    source_dir: "{{ developer_user_home }}/devel/pulp_file"
+
+# Uncomment if using pulp-rpm
+pulp_use_system_wide_pkgs: true
+pulp_settings:
+  secret_key: "unsafe_default"
+  content_origin: "http://{{ ansible_fqdn }}"
