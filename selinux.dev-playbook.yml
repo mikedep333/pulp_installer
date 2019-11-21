@@ -63,6 +63,27 @@
       become: true
       become_user: '{{ pulp_user }}'
 
+    - name: Create functional tests script
+      lineinfile:
+        path: "{{ developer_user_home }}/devel/tests.sh"
+        mode: 0777
+        create: true
+        insertbefore: BOF
+        line: "cd {{ pulp_source_dir }} && pytest -v -r sx --color{{ '=' }}yes --pyargs pulpcore.tests.functional"
+      become: true
+      become_user: '{{ developer_user }}'
+
+    - name: Populate plugins in functional tests script
+      lineinfile:
+        path: "{{ developer_user_home }}/devel/tests.sh"
+        mode: 0777
+        create: true
+        line: "cd {{ item.value.source_dir }} && pytest -v -r sx --color{{ '=' }}yes --pyargs {{ item.key|replace('-','_') }}.tests.functional"
+      with_dict: "{{ pulp_install_plugins }}"
+      when: pulp_install_plugins[item.key].source_dir is defined
+      become: true
+      become_user: '{{ developer_user }}'
+
   roles:
     - pulp-database
     - pulp-workers
