@@ -44,14 +44,6 @@
       become_user: '{{ developer_user }}'
 
   post_tasks:
-    - name: workaround lack of test_requirements.txt
-      copy:
-        content: "# All test requirements\n-r functest_requirements.txt\n-r unittest_requirements.txt\n"
-        dest: "{{ developer_user_home }}/devel/pulp-certguard/test_requirements.txt"
-        mode: 0666
-      become: true
-      become_user: '{{ developer_user }}'
-
     - name: install test requirements for plugins
       pip:
         requirements: '{{ item.value.source_dir }}/test_requirements.txt'
