@@ -24,4 +24,4 @@ install:
   - pip install --upgrade pip
   - pip install tox
 script:
-  - tox
+  - TRAVIS_WAIT="travis_wait 20" tox
