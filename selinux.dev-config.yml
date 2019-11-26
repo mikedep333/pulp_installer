@@ -3,10 +3,14 @@
 pulp_devel_supplement_bashrc: true
 pulp_default_admin_password: password
 
-pulp_user: "{{ ansible_user_id }}"
+pulp_user: "pulp"
 developer_user: "{{ ansible_user_id }}"
 developer_user_home: "{{ ansible_user_dir }}"
 pulp_source_dir: "{{ developer_user_home }}/devel/pulpcore"
+
+# Undocumented variable. Pulp will be installed from the source dir
+# but to the site-packages path.
+pulp_editable_mode: False
 
 pulp_install_plugins:
   # pulp-ansible:
