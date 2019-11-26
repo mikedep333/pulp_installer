@@ -15,13 +15,13 @@ language: python
 matrix:
   include:
     - python: 2.7
-      env: TOXENV=py27
+      env: TOXENV=py27 TRAVIS_WAIT="travis_wait 20"
     - python: 3.6
-      env: TOXENV=py36
+      env: TOXENV=py36 TRAVIS_WAIT="travis_wait 20"
     - python: 3.7
-      env: TOXENV=py37
+      env: TOXENV=py37 TRAVIS_WAIT="travis_wait 20"
 install:
   - pip install --upgrade pip
   - pip install tox
 script:
-  - TRAVIS_WAIT="travis_wait 20" tox
+  - export -f travis_wait && tox
