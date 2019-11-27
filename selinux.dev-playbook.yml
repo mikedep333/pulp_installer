@@ -86,6 +86,7 @@
       become_user: '{{ developer_user }}'
 
   roles:
+    - gzm55.smart_ssh_pipelining
     - pulp-database
     - pulp-workers
     - pulp-resource-manager
