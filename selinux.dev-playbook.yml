@@ -22,6 +22,15 @@
       become: true
       become_user: '{{ developer_user }}'
 
+    # So that pip can install from it
+    - name: Make devel parent dir accessible to the pulp user
+      file:
+        path: "{{ developer_user_home }}"
+        state: directory
+        mode: 0755
+      become: true
+      become_user: '{{ developer_user }}'
+
     - name: Install git
       package:
         name: git
