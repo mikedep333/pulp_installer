@@ -199,6 +199,12 @@
         virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
       when: prereq_pip_packages | length > 0
 
+    - name: Install old createrepo_c
+      pip:
+        name: "createrepo-c==0.15.5"
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+
     - name: Install pulpcore package via PyPI
       pip:
         name: pulpcore

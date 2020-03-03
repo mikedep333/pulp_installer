@@ -1,2 +1,4 @@
----
 ansible_ssh_pipelining: True
+pulp_install_plugins:
+  pulp-rpm:
+    prereq_role: pulp.pulp_rpm_prerequisites
