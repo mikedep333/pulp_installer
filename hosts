@@ -1,2 +1,1 @@
-aws_centos7  ansible_host=ec2-18-195-211-63.eu-central-1.compute.amazonaws.com ansible_port=22 ansible_user='centos' 
-aws_fedora31 ansible_host=ec2-3-122-245-148.eu-central-1.compute.amazonaws.com ansible_port=22 ansible_user='fedora' 
+aws_centos8  ansible_host=ec2-3-134-82-178.us-east-2.compute.amazonaws.com ansible_port=22 ansible_user='ec2-user' 

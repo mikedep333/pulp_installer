@@ -10,6 +10,56 @@
         msg: >
           "You must update Ansible to at least 2.8 to use this version of Pulp 3 Installer."
 
+    # These user tasks are copied from pulp_common/tasks/install.yml
+    - block:
+
+        # Become root so as to search paths like /usr/sbin.
+        - name: Find the nologin executable
+          command: which nologin
+          changed_when: False
+          check_mode: False
+          register: result
+
+        - name: Make sure {{ pulp_group }} group exists
+          group:
+            name: '{{ pulp_group }}'
+            gid: '{{ pulp_group_id }}'
+            state: present
+            system: true
+
+        # If we do not create it here, but it is separate from developer_user,
+        # the following task would create it incorrectly with default settings.
+        - name: Create user {{ pulp_user }}
+          user:
+            name: '{{ pulp_user }}'
+            uid: '{{ pulp_user_id }}'
+            shell: '{{ result.stdout.strip() }}'
+            home: '{{ pulp_user_home }}'
+            system: true
+            groups:
+              - '{{ pulp_group }}'
+            append: true
+          # The check implicitly does an or for this check:
+          # developer_user is not defined
+          when: pulp_user != developer_user|default('')
+
+        - name: Add user {{ pulp_user }} to extra groups
+          user:
+            name: '{{ pulp_user }}'
+            groups: '{{ pulp_extra_groups }}'
+            append: true
+          when: pulp_extra_groups is defined
+
+        - name: Add user {{ developer_user }} to {{ pulp_group }} group
+          user:
+            name: '{{ developer_user }}'
+            groups:
+              - '{{ pulp_group }}'
+            append: true
+          when: developer_user is defined
+
+      become: true
+
     - name: Include vars after running setup
       include_vars: selinux.dev-config.yml
 
@@ -44,9 +94,9 @@
         umask: "000"
         version: "{{ item.version }}"
       with_items:
-        - { name: "pulpcore", version: "3.0" }
-        - { name: "pulp_file", version: "0.1" }
-        - { name: "pulp_container", version: "1.0" }
+        - { name: "pulpcore", version: "3.5" }
+        - { name: "pulp_file", version: "1.1" }
+        - { name: "pulp_container", version: "2.0" }
         - { name: "pulp_rpm", version: "master" }
         - { name: "pulp-certguard", version: "master" }
       become: true
@@ -87,11 +137,7 @@
 
   roles:
     - gzm55.smart_ssh_pipelining
-    - pulp-database
-    - pulp-workers
-    - pulp-resource-manager
-    - pulp-webserver
-    - pulp-content
-    - pulp-devel
+    - pulp_all_services
+    - pulp_devel
   environment:
     DJANGO_SETTINGS_MODULE: pulpcore.app.settings
