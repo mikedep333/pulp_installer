@@ -114,6 +114,17 @@
       become: true
       become_user: '{{ pulp_user }}'
 
+    - name: install test clients for plugins (undeclared test requirements)
+      pip:
+        name: '{{ item.key }}-client'
+        state: present
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      with_dict: '{{ pulp_install_plugins }}'
+      when: pulp_install_plugins[item.key].source_dir is defined
+      become: true
+      become_user: '{{ pulp_user }}'
+
     - name: Create functional tests script
       lineinfile:
         path: "{{ developer_user_home }}/devel/tests.sh"
