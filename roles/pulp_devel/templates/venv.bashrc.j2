@@ -14,3 +14,6 @@ export VIRTUALENVWRAPPER_HOOK_DIR=$HOME/.virtualenvs
 {% if ansible_distribution == 'CentOS' %}
 source /usr/bin/virtualenvwrapper.sh
 {% endif %}
+{% if ansible_distribution == 'Red Hat' %}
+source /usr/bin/virtualenvwrapper.sh
+{% endif %}

@@ -36,6 +36,7 @@
             shell: '{{ result.stdout.strip() }}'
             home: '{{ pulp_user_home }}'
             system: true
+            group: '{{ pulp_group }}'
             groups:
               - '{{ pulp_group }}'
             append: true
@@ -94,10 +95,10 @@
         umask: "000"
         version: "{{ item.version }}"
       with_items:
-        - { name: "pulpcore", version: "3.5" }
-        - { name: "pulp_file", version: "1.1" }
+        - { name: "pulpcore", version: "3.5.0" }
+        - { name: "pulp_file", version: "1.1.0" }
         - { name: "pulp_container", version: "2.0" }
-        - { name: "pulp_rpm", version: "master" }
+        - { name: "pulp_rpm", version: "3.4.2" }
         - { name: "pulp-certguard", version: "master" }
       become: true
       become_user: '{{ developer_user }}'
@@ -114,16 +115,39 @@
       become: true
       become_user: '{{ pulp_user }}'
 
-    - name: install test clients for plugins (undeclared test requirements)
+    - name: install optional server-side package for pulp-certguard
       pip:
-        name: '{{ item.key }}-client'
+        name: 'rhsm'
         state: present
         virtualenv: '{{ pulp_install_dir }}'
         virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
-      with_dict: '{{ pulp_install_plugins }}'
-      when: pulp_install_plugins[item.key].source_dir is defined
       become: true
       become_user: '{{ pulp_user }}'
+
+    - name: Create bindings install script
+      blockinfile:
+        path: "{{ developer_user_home }}/devel/bindings.sh"
+        mode: 0777
+        create: true
+        insertbefore: BOF
+        block: |
+          shopt -s expand_aliases
+          source ~/.bashrc.d/venv.bashrc
+          source ~/.bashrc.d/alias.bashrc
+          pbindings pulpcore python
+      become: true
+      become_user: '{{ developer_user }}'
+
+    - name: Populate plugins in bindings install script
+      lineinfile:
+        path: "{{ developer_user_home }}/devel/bindings.sh"
+        mode: 0777
+        create: true
+        line: "pbindings {{ item.key|replace('-','_') }} python"
+      with_dict: "{{ pulp_install_plugins }}"
+      when: pulp_install_plugins[item.key].source_dir is defined
+      become: true
+      become_user: '{{ developer_user }}'
 
     - name: Create functional tests script
       lineinfile:
