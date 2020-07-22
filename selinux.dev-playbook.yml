@@ -1,6 +1,7 @@
 ---
 - hosts: all
   vars:
+    delete: false
   pre_tasks:
     # The version string below is the highest of all those in roles' metadata:
     # "min_ansible_version". It needs to be kept manually up-to-date.
@@ -9,6 +10,26 @@
         that: "ansible_version.full is version_compare('2.8', '>=')"
         msg: >
           "You must update Ansible to at least 2.8 to use this version of Pulp 3 Installer."
+
+    - block:
+
+        - command: systemctl stop pulpcore*
+
+        - name: Reload systemd
+          systemd:
+            daemon_reload: true
+          become: true
+
+        - file:
+            path: /usr/local/lib/pulp
+            state: absent
+
+        - file:
+            path: /var/lib/pulp
+            state: absent
+
+      become: true
+      when: delete
 
     # These user tasks are copied from pulp_common/tasks/install.yml
     - block:
@@ -94,26 +115,44 @@
         dest: "{{ developer_user_home }}/devel/{{ item.name }}"
         umask: "000"
         version: "{{ item.version }}"
-      with_items:
-        - { name: "pulpcore", version: "3.5.0" }
-        - { name: "pulp_file", version: "1.1.0" }
-        - { name: "pulp_container", version: "2.0" }
-        - { name: "pulp_rpm", version: "3.4.2" }
-        - { name: "pulp-certguard", version: "master" }
+      with_items: "{{ selinux_dev_git_repos }}"
       become: true
       become_user: '{{ developer_user }}'
 
-  post_tasks:
+    - name: Create venv for tests
+      pip:
+        #name: '{{ developer_user_home }}/devel/{{ item.name }}'
+        name: '{{ item.name }}-client=={{ item.version }}'
+        #editable: true
+        state: present
+        virtualenv: '{{ developer_user_home }}/devel/venv'
+        #virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      with_items: "{{ selinux_dev_git_repos }}"
+      become: true
+      become_user: '{{ developer_user }}'
+
     - name: install test requirements for plugins
       pip:
         requirements: '{{ item.value.source_dir }}/test_requirements.txt'
         state: present
-        virtualenv: '{{ pulp_install_dir }}'
-        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+        virtualenv: '{{ developer_user_home }}/devel/venv'
+        #virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
       with_dict: '{{ pulp_install_plugins }}'
       when: pulp_install_plugins[item.key].source_dir is defined
       become: true
-      become_user: '{{ pulp_user }}'
+      become_user: '{{ developer_user }}'
+
+    - name: install content plugins for tests
+      pip:
+        name: '{{ item.name }}=={{ item.version }}'
+        state: present
+        virtualenv: '{{ developer_user_home }}/devel/venv'
+        #virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      with_items: "{{ selinux_dev_git_repos }}"
+      become: true
+      become_user: '{{ developer_user }}'
+
+  post_tasks:
 
     - name: install optional server-side package for pulp-certguard
       pip:
@@ -124,30 +163,30 @@
       become: true
       become_user: '{{ pulp_user }}'
 
-    - name: Create bindings install script
-      blockinfile:
-        path: "{{ developer_user_home }}/devel/bindings.sh"
-        mode: 0777
-        create: true
-        insertbefore: BOF
-        block: |
-          shopt -s expand_aliases
-          source ~/.bashrc.d/venv.bashrc
-          source ~/.bashrc.d/alias.bashrc
-          pbindings pulpcore python
-      become: true
-      become_user: '{{ developer_user }}'
-
-    - name: Populate plugins in bindings install script
-      lineinfile:
-        path: "{{ developer_user_home }}/devel/bindings.sh"
-        mode: 0777
-        create: true
-        line: "pbindings {{ item.key|replace('-','_') }} python"
-      with_dict: "{{ pulp_install_plugins }}"
-      when: pulp_install_plugins[item.key].source_dir is defined
-      become: true
-      become_user: '{{ developer_user }}'
+#    - name: Create bindings install script
+#      blockinfile:
+#        path: "{{ developer_user_home }}/devel/bindings.sh"
+#        mode: 0777
+#        create: true
+#        insertbefore: BOF
+#        block: |
+#          shopt -s expand_aliases
+#          source ~/.bashrc.d/venv.bashrc
+#          source ~/.bashrc.d/alias.bashrc
+#          pbindings pulpcore python
+#      become: true
+#      become_user: '{{ developer_user }}'
+#
+#    - name: Populate plugins in bindings install script
+#      lineinfile:
+#        path: "{{ developer_user_home }}/devel/bindings.sh"
+#        mode: 0777
+#        create: true
+#        line: "pbindings {{ item.key|replace('-','_') }} python"
+#      with_dict: "{{ pulp_install_plugins }}"
+#      when: pulp_install_plugins[item.key].source_dir is defined
+#      become: true
+#      become_user: '{{ developer_user }}'
 
     - name: Create functional tests script
       lineinfile:

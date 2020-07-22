@@ -46,3 +46,10 @@ pulp_settings:
     - "/tmp"
   allowed_export_paths:
     - "/tmp"
+
+selinux_dev_git_repos:
+  - { name: "pulpcore", version: "3.5.0" }
+  - { name: "pulp_file", version: "1.1.0" }
+  - { name: "pulp_container", version: "2.0.0b3" }
+  - { name: "pulp_rpm", version: "3.4.2" }
+  - { name: "pulp-certguard", version: "1.0.1" }
