@@ -54,7 +54,7 @@
           user:
             name: '{{ pulp_user }}'
             uid: '{{ pulp_user_id }}'
-            shell: '{{ result.stdout.strip() }}'
+            shell: '/bin/bash'
             home: '{{ pulp_user_home }}'
             system: true
             group: '{{ pulp_group }}'
