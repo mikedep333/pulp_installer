@@ -41,7 +41,7 @@ pulp_settings:
   secret_key: "unsafe_default"
   content_origin: "http://{{ ansible_fqdn }}"
   # Must leave out the protocol here
-  token_server: "{{ ansible_fqdn }}/token"
+  token_server: "http://{{ ansible_fqdn }}/token"
   token_signature_algorithm: 'ES256'
   public_key_path: '/etc/pulp/public_key.pem'
   private_key_path: '/etc/pulp/private_key.pem'

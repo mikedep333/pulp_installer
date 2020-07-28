@@ -31,6 +31,28 @@
       become: true
       when: delete
 
+    - block:
+
+        - name: Create docker config dir
+          file:
+            path: /etc/docker
+            state: directory
+
+        - name: Configure docker daemon for pulp_container tests
+          template:
+            src: daemon.json.j2
+            dest: /etc/docker/daemon.json
+          become: true
+          notify: Restart Docker
+
+        - name: Configure podman for pulp_container tests
+          ini_file:
+            path: /etc/containers/registries.conf
+            section: registries.insecure
+            option: registries
+            value: "['127.0.0.1:24816','127.0.0.1:24817','localhost:24816','localhost:24817']"
+          become: true
+
     # These user tasks are copied from pulp_common/tasks/install.yml
     - block:
 
@@ -215,3 +237,10 @@
     - pulp_devel
   environment:
     DJANGO_SETTINGS_MODULE: pulpcore.app.settings
+  handlers:
+    - name: Restart Docker
+      systemd:
+        name: docker
+        state: restarted
+      become: true
+      ignore_errors: true
