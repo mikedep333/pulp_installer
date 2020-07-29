@@ -65,8 +65,15 @@
         append: true
       when: developer_user is defined
 
-    - name: Reset ssh conn to allow user changes to affect when ssh user and pulp user are the same
+    - name: Reset ssh conn to allow user changes to affect when ssh user and pulp / developer user are the same
       meta: reset_connection
+
+    # Observed being needed (for roughly 90 secs) on a RHEL8.2 AWS instance.
+    # Even when the ansible_user was not modified.
+    - name: wait for connection
+      wait_for_connection:
+        connect_timeout: 180
+        timeout: 360
 
     - name: Create cache dir for Pulp
       file:
