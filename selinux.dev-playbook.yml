@@ -155,12 +155,20 @@
 
     - name: install test requirements for plugins
       pip:
-        requirements: '{{ item.value.source_dir }}/test_requirements.txt'
+        requirements: '{{ developer_user_home }}/devel/{{ item.name }}/test_requirements.txt'
         state: present
         virtualenv: '{{ developer_user_home }}/devel/venv'
         #virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
-      with_dict: '{{ pulp_install_plugins }}'
-      when: pulp_install_plugins[item.key].source_dir is defined
+      loop: '{{ selinux_dev_git_repos }}'
+      become: true
+      become_user: '{{ developer_user }}'
+
+    - name: install undeclared test requirements for plugins
+      pip:
+        name: pytest
+        state: present
+        virtualenv: '{{ developer_user_home }}/devel/venv'
+        #virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
       become: true
       become_user: '{{ developer_user }}'
 
@@ -210,24 +218,13 @@
 #      become: true
 #      become_user: '{{ developer_user }}'
 
-    - name: Create functional tests script
-      lineinfile:
-        path: "{{ developer_user_home }}/devel/tests.sh"
-        mode: 0777
-        create: true
-        insertbefore: BOF
-        line: "cd {{ pulp_source_dir }} && pytest -v -r sx --color{{ '=' }}yes --pyargs pulpcore.tests.functional"
-      become: true
-      become_user: '{{ developer_user }}'
-
     - name: Populate plugins in functional tests script
       lineinfile:
         path: "{{ developer_user_home }}/devel/tests.sh"
         mode: 0777
         create: true
-        line: "cd {{ item.value.source_dir }} && pytest -v -r sx --color{{ '=' }}yes --pyargs {{ item.key|replace('-','_') }}.tests.functional"
-      with_dict: "{{ pulp_install_plugins }}"
-      when: pulp_install_plugins[item.key].source_dir is defined
+        line: "cd {{ developer_user_home }}/devel/{{ item.name }} && pytest -v -r sx --color{{ '=' }}yes --pyargs {{ item.name|replace('-','_') }}.tests.functional"
+      loop: "{{ selinux_dev_git_repos }}"
       become: true
       become_user: '{{ developer_user }}'
 
