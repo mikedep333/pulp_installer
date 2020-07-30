@@ -1,4 +1,0 @@
-sudo su - pulp --shell /bin/bash
-source /usr/local/lib/pulp/bin/activate
-cd /home/ec2-user/devel/pulp-openapi-generator
-pip install ./*-client

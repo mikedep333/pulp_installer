@@ -1,5 +1,5 @@
-#sudo openssl ecparam -genkey -name prime256v1 -noout -out /etc/pulp/private_key.pem
-#sudo openssl ec -in /var/lib/pulp/tmp/private.key -pubout -out /etc/pulp/public_key.pem
-#sudo chown pulp:pulp /etc/pulp/private_key.pem
-#sudo chown pulp:pulp /etc/pulp/public_key.pem
+sudo openssl ecparam -genkey -name prime256v1 -noout -out /etc/pulp/private_key.pem
+sudo openssl ec -in /var/lib/pulp/tmp/private.key -pubout -out /etc/pulp/public_key.pem
+sudo chown pulp:pulp /etc/pulp/private_key.pem
+sudo chown pulp:pulp /etc/pulp/public_key.pem
 sudo chmod 2775 /etc/pulp
