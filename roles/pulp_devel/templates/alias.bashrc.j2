@@ -31,7 +31,7 @@ _pstatus_help="Report the status of all pulp-related services"
 pdbreset() {
     workon pulp
     pstop
-    {{ pulp_django_admin_path }} reset_db --noinput
+    {{ pulp_django_admin_path }} flush --noinput
     {{ pulp_django_admin_path }} migrate
     {{ pulp_django_admin_path }} reset-admin-password --password {{ pulp_default_admin_password }}
 }
