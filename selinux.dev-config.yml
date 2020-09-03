@@ -16,7 +16,8 @@ pulp_api_bind: "0.0.0.0:24817"
 pulp_content_bind: "0.0.0.0:24816"
 
 pulp_install_plugins:
-  # pulp-ansible:
+  pulp-ansible:
+    version: "0.2.0b15"
   #   source_dir: "/home/vagrant/devel/pulp_ansible"
   pulp-certguard:
     version: "1.0.1"
@@ -56,6 +57,7 @@ pulp_settings:
 
 selinux_dev_git_repos:
   - { name: "pulpcore", version: "3.5.0" }
+  - { name: "pulp_ansible", version: "0.2.0b15" }
   - { name: "pulp_file", version: "1.1.0" }
   - { name: "pulp_container", version: "2.0.0b3" }
   - { name: "pulp_rpm", version: "3.4.2" }
