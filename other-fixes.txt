@@ -1,3 +1,5 @@
 Add the alias "pulp" to both 127.0.0.1 and ::1 in /etc/hosts
 
 (Because some pulpcore functional import tests seem to have pulp:80 hardcoded.)
+
+ln -s /var/lib/pulp/sign-metadata.sh /var/lib/pulp/devel/venv/lib/python3.6/site-packages/pulp_rpm/tests/functional/sign-metadata.sh
