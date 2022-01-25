@@ -6,8 +6,8 @@ dependency:
 driver:
   name: docker
 lint: |
-    yamllint .
-    ansible-lint
+    time yamllint .
+    time ansible-lint
     # rubocop
 # This is ignored by molecule, but can be reused in yaml
 .platform_base: &platform_base
